@@ -1,0 +1,32 @@
+<script type="text/javascript">
+    var ws;
+    var box = document.getElementById("box");
+
+    function startWS(){
+        ws = new websocket("ws:127.0.0.1:8000");
+        ws.onopen = function(msg){
+            console.log("websocket opened!");
+        }
+        ws.onomessage = function(message){
+            console.log("receive message:"+message.data);
+            box.insertAdjacentHTML("beforeend", "<p>"+message.data+"</p>");
+        }
+        ws.onerror = function(err){
+            console.log("error:"+err.name+err.number);
+        }
+        ws.onclose = function(){
+            console.log("websocket closed!")
+        }
+    }
+
+    function sendMsg(){
+        console.log("sending a message...");
+        var text = document.getElementById("text");
+        ws.send(text.value);
+    }
+
+    window.onbeforeunload = function(){
+        ws.onclose = function(){}
+        ws.close()
+    }
+</script>
