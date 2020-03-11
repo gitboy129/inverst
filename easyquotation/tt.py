@@ -4,7 +4,7 @@ import sys
 import datetime
 import urllib.request
 import json
-
+#http://fund.eastmoney.com/data/rankhandler.aspx?op=ph&dt=kf&ft=lof&rs=&gs=0&sc=zzf&st=desc&sd=2019-03-11&ed=2020-03-11&qdii=&tabSubtype=,,,,,&pi=1&pn=50
 
 
 res = urllib.request.urlopen("http://fundgz.1234567.com.cn/js/162703.js")
