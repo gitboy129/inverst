@@ -21,8 +21,13 @@ print(resp["name"])
 print(resp["dwjz"])
 
 
-res2 = urllib.request.urlopen("http://fund.eastmoney.com/js/fundcode_search.js")
-zfc2=res2.read().decode('utf-8')[8:-1]
-print(zfc2)
-resl=json.loads(zfc2)
-print(resl)
+# res2 = urllib.request.urlopen("http://fund.eastmoney.com/js/fundcode_search.js")
+# zfc2=res2.read().decode('utf-8')[8:-1]
+# print(zfc2)
+# resl=json.loads(zfc2)
+# print(resl)
+
+
+res3= urllib.request.urlopen("http://fund.eastmoney.com/data/rankhandler.aspx?op=ph&dt=kf&ft=lof&pi=1&pn=300")
+zfc3=res3.read().decode('utf-8')[22:-158]
+print(zfc3)
