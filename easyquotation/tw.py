@@ -1,32 +1,60 @@
-#https://transferwise.com/gateway/v2/quotes/
-import sys
-import datetime
-import urllib.request
-import json
+import requests
+import uuid
 
+class transferwise :
+    def __init__(self) :
+        self.headers = {
+                        'Accept':          '*/*',
+                        'Accept-Encoding': 'gzip, deflate',
+                        'Content-Type':    'application/json',
+                        'Authorization':   'Bearer ec50cd47-25bc-4db6-9ad0-3b03de013277',
+                        }
 
-url = "https://transferwise.com/gateway/v2/quotes/" # 接口地址
+    def auth(self) :
+        r = requests.post('https://api.transferwise.com/oauth/token', data=data, headers=self.headers)
 
-# 消息头数据
-headers = {
-'Connection': 'keep-alive',
-'Origin':'https://transferwise.com',
-'Content-Type': 'application/json',
-'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
-'Accept': 'application/json',
-'Referer': 'https://transferwise.com/us',
-'Accept-Encoding': 'gzip, deflate, br',
-'x-authorization-key': 'dad99d7d8e52c2c8aaf9fda788d8acdc',
-'accept-language': 'en'
-# ':authority': 'transferwise.com',
-# ':method': 'POST',
-# ':path': '/gateway/v2/quotes/',
-# ':scheme': 'https'
-}
+    def get_profile(self) :
+        r = requests.get('https://api.transferwise.com/v1/profiles', headers=self.headers)
 
-payload = {"sourceAmount":4000,"sourceCurrency":"USD","targetCurrency":"JPY","preferredPayIn":"null","guaranteedTargetAmount":False,"referralCode":"tianz12"}
-# verify = False 忽略SSH 验证
-fdata = urllib.parse.urlencode(payload).encode(encoding='UTF8')
-req = urllib.request.Request(url,headers=headers,data=fdata)
-r = urllib.request.urlopen(req)
-print(r.json())
+        return r.json()
+
+    def get_quote(self, profile='', amount=0) :
+        data = {'profile':              str(profile),
+                'sourceCurrency':       'JPY',
+                'targetCurrency':       'USD',
+                'sourceAmount':         amount,
+                # 'targetAmount':         0
+                }
+
+        r = requests.post('https://api.transferwise.com/v2/quotes', json=data, headers=self.headers)
+        # r = requests.post('https://api.sandbox.transferwise.tech/v1/quotes', data=data, headers=self.headers)
+
+        return r.json()
+
+    def get_accounts(self, profile='', currency='USD') :
+        r = requests.get('https://api.transferwise.com/v1/accounts?profile=' + str(profile) + '&currency=' + currency, headers=self.headers)
+        # r = requests.post('https://api.sandbox.transferwise.tech/v1/quotes', data=data, headers=self.headers)
+
+        return r.json()
+
+    def create_transfer(self, quote_id='', account='') :
+        data = {'targetAccount':            str(account),
+                'quoteUuid':                quote_id,
+                'customerTransactionId':    str(uuid.uuid4()),
+                'details' : {   'transferPurpose'   : 'verification.transfers.purpose.pay.bills',
+                                'sourceOfFunds'     : 'verification.source.of.funds.other'}
+                # 'targetAmount':         0
+                }
+
+        r = requests.post('https://api.transferwise.com/v1/transfers', json=data, headers=self.headers)
+
+        return r.json()
+
+    def cancel_transfer(self, id) :
+        r = requests.put('https://api.transferwise.com/v1/transfers/' + str(id) + '/cancel', headers=self.headers)
+
+        return r.json()
+
+if __name__ == '__main__' :
+    tw = transferwise()
+    tw.cancel_transfer('112912208')
