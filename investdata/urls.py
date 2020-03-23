@@ -20,6 +20,8 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r'user', views.userViewSet)
+router.register(r'fund', views.allfundViewSet)
+
 
 urlpatterns = [
     path('', include(router.urls)),
