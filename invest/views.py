@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse,JsonResponse
-from invest.models import user
+from invest.models import user,lof
 from django.core import serializers
-from invest.serializers import userserialize
+from invest.serializers import userserialize,lofSerialize
 from rest_framework import viewsets
-import easyquotation
-
-
+#import easyquotation
+from  easyquotation.ttdata import ttApi
+from invest import utility
 # def index(request):
 #     MOCK_DATA = 'var hq_str_sz162411="华宝油气,0.489,0.488,0.491,0.492,0.488,0.490,0.491,133819867,65623147.285,2422992,0.490,4814611,0.489,2663142,0.488,1071900,0.487,357900,0.486,5386166,0.491,8094689,0.492,6087538,0.493,2132373,0.494,5180900,0.495,2019-03-12,15:00:03,00";\n'
 #     user1=user.objects.all()
@@ -22,3 +22,14 @@ class userViewSet(viewsets.ModelViewSet):
     queryset = user.objects.all();
     serializer_class = userserialize
 # Create your views here.
+
+
+class allfundViewSet(viewsets.ModelViewSet):
+    queryset = lof.objects.all();
+    serializer_class = lofSerialize
+    ttapi=ttApi()
+    funds=ttapi.get_allfund()
+    #print(funds)
+    objects1=utility.jsontoobjects1(funds)
+    queryset.delete()
+    lof.objects.bulk_create(objects1)
